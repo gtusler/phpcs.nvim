@@ -15,15 +15,18 @@ local runner = require('phpcs.runner')
 --------------------------------------
 -- VARIABLES
 
----Path to the `phpcs` binary
+---Path to the `phpcs` binary.
 M.phpcs_path = vim.g.nvim_phpcs_config_phpcs_path or phpcs_path
----Path to the `phpcbf` binary
+---Path to the `phpcbf` binary.
 M.phpcbf_path = vim.g.nvim_phpcs_config_phpcbf_path or phpcbf_path
----Name of phpcs standard or path to phpcs.xml file
+---Name of phpcs standard or path to phpcs.xml file.
 M.phpcs_standard = vim.g.nvim_phpcs_config_phpcs_standard or phpcs_standard
----A fallback for use when automatically finding a phpcs.xml file fails
+---A fallback for use when automatically finding a phpcs.xml file fails.
 M.phpcs_standard_fallback = vim.g.nvim_phpcs_config_phpcs_standard_fallback or phpcs_standard_fallback
+---Whether or not to fix file format on save.
 M.fix_on_save = vim.g.nvim_phpcs_config_fix_on_save or fix_on_save
+---Whether or not to do any sniffing at all.
+M.enabled = true
 
 M.namespace = nil
 
@@ -99,6 +102,14 @@ local function doLogCurrentStandard()
     util.notify(M.phpcs_standard)
 end
 
+local function doSnifferEnable()
+    M.enabled = true
+end
+
+local function doSnifferDisable()
+    M.enabled = false
+end
+
 local function doLogFixOnSave()
     local message = "Fix on save is disabled."
     if M.fix_on_save then
@@ -123,10 +134,26 @@ end
 -- COMMANDS
 
 vim.api.nvim_create_user_command(
+    'PhpcsDisable',
+    doSnifferDisable,
+    {
+        desc = 'Dynamically disable sniffing',
+    }
+)
+
+vim.api.nvim_create_user_command(
+    'PhpcsEnable',
+    doSnifferEnable,
+    {
+        desc = 'Dynamically enable sniffing',
+    }
+)
+
+vim.api.nvim_create_user_command(
     'Phpcs',
     doRunCodeSniffer,
     {
-        desc = 'Run phpcs code sniffer on the current buffer.'
+        desc = 'Run phpcs code sniffer on the current buffer.',
     }
 )
 
@@ -134,7 +161,7 @@ vim.api.nvim_create_user_command(
     'Phpcbf',
     doRunFormatter,
     {
-        desc = 'Run phpcbf formatter on the file in the current buffer.'
+        desc = 'Run phpcbf formatter on the file in the current buffer.',
     }
 )
 
@@ -158,7 +185,7 @@ vim.api.nvim_create_user_command(
     'PhpcsFixOnSave',
     doLogFixOnSave,
     {
-        desc = "Log whether or not fix on save is enabled."
+        desc = "Log whether or not fix on save is enabled.",
     }
 )
 
@@ -191,6 +218,9 @@ vim.api.nvim_create_autocmd(
         pattern = '*.php',
         group = autocmd_group,
         callback = function(args)
+            if not M.enabled then
+                return
+            end
             doRunCodeSniffer()
         end,
     }
@@ -202,6 +232,9 @@ vim.api.nvim_create_autocmd(
         pattern = '*.php',
         group = autocmd_group,
         callback = function(args)
+            if not M.enabled then
+                return
+            end
             if M.fix_on_save then
                 doRunFormatter()
             else

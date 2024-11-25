@@ -60,6 +60,8 @@ There are commands available, try typing `:Php`, hitting `tab` and seeing what's
 
 - `:Phpcs` Run the code sniffer.
 - `:Phpcbf` Run the code formatter.
+- `:PhpcsDisable` Disable automatic sniffing.
+- `:PhpcsEnable` Enable automatic sniffing.
 - `:PhpcsCurrentStandard` Print the standard which is currently in use.
 - `:PhpcsListStandards` Print standards which are installed and accessible via a string in config.
 - `:PhpcsFixOnSave` Print the current status of fix on save.
