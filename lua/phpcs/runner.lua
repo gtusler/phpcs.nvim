@@ -20,6 +20,7 @@ Runner.cs = function(namespace, phpcs_path, phpcs_standard)
             '--report=json',
             '--report-file=' .. report_file,
             '--standard=' .. phpcs_standard,
+            '-s',
             '-',
         },
         writer = vim.api.nvim_buf_get_lines(bufnr, 0, -1, true),
@@ -49,7 +50,13 @@ end
 ---@param bufnr any
 ---@return table
 Runner.parse_json = function(encoded, bufnr)
-    local decoded = vim.json.decode(encoded)
+    -- local decoded = vim.json.decode(encoded)
+    local ok, decoded = pcall(vim.json.decode, encoded)
+
+    if not ok then
+        return {}
+    end
+
     local diagnostics = {}
     local uri = vim.fn.bufname(bufnr)
 

@@ -104,10 +104,12 @@ end
 
 local function doSnifferEnable()
     M.enabled = true
+    util.notify('Enabled')
 end
 
 local function doSnifferDisable()
     M.enabled = false
+    util.notify('Disabled')
 end
 
 local function doLogFixOnSave()
